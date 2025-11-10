@@ -1,0 +1,35 @@
+{
+  "categorical_features": [
+    "gender",
+    "goal",
+    "experience",
+    "location",
+    "body_type",
+    "muscle_group",
+    "equipment",
+    "bodypart"
+  ],
+  "numerical_features": [
+    "age",
+    "training_days"
+  ],
+  "target_columns": [
+    "sets",
+    "reps",
+    "intensity",
+    "weight",
+    "rpe"
+  ],
+  "feature_columns": [
+    "age",
+    "gender",
+    "goal",
+    "experience",
+    "training_days",
+    "location",
+    "body_type",
+    "muscle_group",
+    "equipment",
+    "bodypart"
+  ]
+}
