@@ -192,9 +192,11 @@ Pipeline([
 ## 🔧 Technical Implementation
 
 ### **Model Artifacts**
-- `comprehensive_model.pkl` - Trained scikit-learn pipeline (15.2 MB)
+- `comprehensive_model.pkl` - Trained scikit-learn pipeline (219 MB) *[See note below]*
 - `model_info.json` - Feature and target specifications
 - `workout_comprehensive.csv` - Training dataset (57,861 records)
+
+**Note**: The model file (219 MB) exceeds GitHub's 100MB limit and is excluded from the repository. Run `python train_model.py` to regenerate the model locally. The large size is due to the Random Forest ensemble containing 100 decision trees with comprehensive feature encoding for 1,500+ exercises.
 
 ### **Inference Pipeline**
 1. **User Input**: Natural language or structured profile

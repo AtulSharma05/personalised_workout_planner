@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
+# Large model file (219 MB) - too big for GitHub
+# Run the training script to recreate locally
+model/comprehensive_model.pkl
+
 .Python
 build/
 develop-eggs/

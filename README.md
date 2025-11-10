@@ -36,7 +36,13 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Start the API server:**
+4. **Train the model (required first time):**
+```bash
+python train_model.py
+```
+*Note: The model file (219MB) is excluded from GitHub due to size limits. This step recreates it locally.*
+
+5. **Start the API server:**
 ```bash
 python api_server.py
 ```
