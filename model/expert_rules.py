@@ -71,49 +71,69 @@ def refine_predictions(preds, profile):
 
 
 def schedule_exercises(preds, days):
-    # Better scheduler: try push/pull/legs ordering when days >= 3
+    # Better scheduler: distribute exercises across week with proper spacing
     exercises = list(preds.keys())
-    schedule = {d: [] for d in range(1, days+1)}
-
+    
+    # Create schedule for a full week (7 days) with proper rest day spacing
+    schedule = {d: [] for d in range(1, 8)}
+    
     if days <= 2:
-        # full body each session; distribute exercises evenly
+        # For 1-2 days, space them out in the week
+        training_days = [1, 4] if days == 2 else [3]
         for i, ex in enumerate(exercises):
-            day = (i % days) + 1
+            day = training_days[i % days]
             schedule[day].append((ex, preds[ex]))
         return schedule
-
-    # For 3+ days, create a simple split mapping
-    push = {'Bench','OverheadPress'}
-    pull = {'Row'}
-    legs = {'Squat','Deadlift'}
-
-    day_idx = 1
-    # Assign push days
-    for ex in exercises:
-        if ex in push:
-            schedule[day_idx].append((ex, preds[ex]))
-    day_idx += 1
-    # Assign pull days
-    for ex in exercises:
-        if ex in pull:
-            schedule[day_idx].append((ex, preds[ex]))
-    day_idx += 1
-    # Assign legs days
-    for ex in exercises:
-        if ex in legs:
-            schedule[day_idx].append((ex, preds[ex]))
-    # Fill remaining days with remaining exercises or repeat
-    rem = [ex for ex in exercises if ex not in push and ex not in pull and ex not in legs]
-    for d in range(day_idx, days+1):
-        for ex in rem:
-            schedule[d].append((ex, preds[ex]))
-
-    # If some days empty, move exercises round-robin
-    all_assigned = sum(len(v) for v in schedule.values())
-    if all_assigned == 0:
+    
+    # For 3+ days, use optimal spacing throughout the week
+    if days == 3:
+        training_days = [1, 3, 5]  # Mon, Wed, Fri
+    elif days == 4:
+        training_days = [1, 2, 4, 5]  # Mon, Tue, Thu, Fri
+    elif days == 5:
+        training_days = [1, 2, 3, 5, 6]  # Mon-Wed, Fri-Sat
+    elif days == 6:
+        training_days = [1, 2, 3, 4, 5, 6]  # Mon-Sat
+    else:  # 7 days
+        training_days = [1, 2, 3, 4, 5, 6, 7]  # All days
+    
+    # Clear the schedule and only use training days
+    schedule = {d: [] for d in range(1, 8)}
+    
+    # Categorize exercises by type for better distribution
+    push = {'Bench','OverheadPress', 'bench press', 'overhead press', 'push', 'press', 'dip', 'handstand'}
+    pull = {'Row', 'row', 'pull', 'curl'}
+    legs = {'Squat','Deadlift', 'squat', 'deadlift', 'leg', 'femoral', 'hamstring'}
+    stretch = {'stretch', 'runners stretch', 'hamstring stretch'}
+    
+    # Categorize all exercises
+    push_exercises = [ex for ex in exercises if any(p in ex.lower() for p in push)]
+    pull_exercises = [ex for ex in exercises if any(p in ex.lower() for p in pull)]
+    leg_exercises = [ex for ex in exercises if any(l in ex.lower() for l in legs)]
+    stretch_exercises = [ex for ex in exercises if any(s in ex.lower() for s in stretch)]
+    other_exercises = [ex for ex in exercises if ex not in push_exercises + pull_exercises + leg_exercises + stretch_exercises]
+    
+    # Distribute exercises across training days
+    all_exercise_groups = [push_exercises, pull_exercises, leg_exercises, other_exercises]
+    non_empty_groups = [group for group in all_exercise_groups if group]
+    
+    # If we have enough training days, spread exercise types across days
+    if len(non_empty_groups) <= len(training_days):
+        for i, group in enumerate(non_empty_groups):
+            day = training_days[i]
+            for ex in group:
+                schedule[day].append((ex, preds[ex]))
+        
+        # Add stretches to each training day
+        for day in training_days:
+            for ex in stretch_exercises:
+                schedule[day].append((ex, preds[ex]))
+    else:
+        # More exercise types than training days - distribute evenly
         for i, ex in enumerate(exercises):
-            schedule[(i % days) + 1].append((ex, preds[ex]))
-
+            day = training_days[i % len(training_days)]
+            schedule[day].append((ex, preds[ex]))
+    
     return schedule
 
 

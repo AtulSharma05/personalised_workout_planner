@@ -90,7 +90,8 @@ def _format_plan_as_natural_language(schedule_weeks, profile, weeks):
             schedule = schedule_weeks[week_num - 1]
             explanation += f"**Week {week_num}:**\n"
             
-            for day in range(1, days + 1):
+            # Show all 7 days of the week
+            for day in range(1, 8):
                 if day in schedule and schedule[day]:
                     explanation += f"Day {day}: "
                     exercises = []
